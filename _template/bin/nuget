@@ -1,6 +1,6 @@
 host_os = RbConfig::CONFIG['host_os']
 windows = /mswin|msys|mingw|cygwin|bccwin|wince|emc/.match(host_os)
 to_exec = [File.dirname(__FILE__) + "/nuget.exe", ARGV.join(' ')]
-to_exec.insert(0,"mono") if ! windows
+to_exec.insert(0, "mono --runtime=v4.0") if ! windows
 result = system(to_exec.join(' '))
 exit 1 unless result
