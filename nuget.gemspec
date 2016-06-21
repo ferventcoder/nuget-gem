@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.platform    = Gem::Platform::RUBY
   spec.name        = 'nuget'
   spec.version     = version
-  spec.files = Dir['bin/**/*']
+  spec.files = ['bin/LICENSE.txt','bin/nuget']+Dir['lib/**/*']
   spec.bindir = 'bin'
   spec.executables << 'nuget'
 
