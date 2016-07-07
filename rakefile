@@ -1,0 +1,41 @@
+require 'rspec/core/rake_task'
+
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec
+require_relative "lib/nuget"
+require 'fileutils'
+$dirname = File.dirname(__FILE__)
+desc "Clean release folder"
+task :clean_release, [:version] do |t,args|
+    version = args[:version]
+    dest = File.join($dirname,'releases', version)
+    rm_rf dest
+end
+
+task :download_version, [:version] => [:clean_release]  do |t, args|
+    version = args[:version]
+    NuGet.download_version(version, File.join($dirname,'releases', version, 'bin'))
+end
+
+task :clone_template, [:version] => [:clean_release] do |t, args|
+    version = args[:version]
+    cd "_template" do
+        Dir.glob('**/*').select do |file| 
+            File.basename(file) != '__NUGET_EXE_HERE__' && ! File.directory?(file)
+        end.each do |file|
+          dir, filename = File.dirname(file), File.basename(file)
+          dest = File.join($dirname,'releases', version, dir)
+          FileUtils.mkdir_p(dest)
+          FileUtils.copy_file(file, File.join(dest, filename))
+        end
+    end
+end
+
+desc "Create a release in folder"
+task :create_release, [:version] => [:clean_release, :clone_template, :download_version] do |t,args|
+    version = args[:version]
+    File.open(File.join($dirname,'releases', version, 'VERSION'), 'w+') do |f|  
+      f.puts version  
+    end
+end
